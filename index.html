@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATELIER &bull; DIGITAL CRAFT</title>
+  
+  <!-- 引入古典人文衬线字体 (带原生优雅回退) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f6f5f1;             /* 暖调骨瓷米灰 */
+      --surface: #ffffff;        /* 纯净卡片白 */
+      --ink: #191918;            /* 碳素墨黑 */
+      --ink-muted: #6b6963;      /* 质感亚麻灰 */
+      --border: #e3e1da;         /* 细腻细线框 */
+      --border-dark: #191918;
+      --font-serif: "Instrument Serif", Georgia, "Songti SC", "SimSun", serif;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Space Mono", Monaco, Consolas, monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background-color: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    /* 顶部悬浮胶囊导航栏 (Floating Capsule Nav) */
+    .nav-dock-wrap {
+      position: fixed;
+      top: 24px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+      pointer-events: none;
+      padding: 0 16px;
+    }
+
+    .nav-dock {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 36px;
+      background: rgba(246, 245, 241, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(25, 25, 24, 0.12);
+      padding: 8px 12px 8px 24px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(25, 25, 24, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    .nav-dock:hover {
+      box-shadow: 0 12px 32px rgba(25, 25, 24, 0.08);
+      border-color: rgba(25, 25, 24, 0.25);
+    }
+
+    .brand-logo {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--ink);
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--ink-muted);
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--ink);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    .lang-pill:hover {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+
+    .menu-trigger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* 刊物式 Hero 区域 */
+    .hero {
+      padding: 190px 0 100px;
+    }
+
+    .hero-meta-strip {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    .hero-heading {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 7.8vw, 102px);
+      line-height: 0.96;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      max-width: 1100px;
+      margin-bottom: 60px;
+    }
+
+    .hero-heading em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: flex-end;
+      padding-top: 30px;
+    }
+
+    .hero-caption {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--ink-muted);
+      max-width: 480px;
+      font-weight: 300;
+    }
+
+    .hero-action-cell {
+      justify-self: end;
+    }
+
+    .btn-craft {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 36px;
+      background: var(--ink);
+      color: var(--bg);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      border-radius: 999px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-craft:hover {
+      transform: translateY(-2px);
+      background: #333330;
+      box-shadow: 0 12px 24px rgba(25, 25, 24, 0.15);
+    }
+
+    /* 通用区块排版 */
+    .section-wrap {
+      border-top: 1px solid var(--border);
+      padding: 120px 0;
+    }
+
+    .section-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 64px;
+    }
+
+    .section-order {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .section-headline {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4vw, 54px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    /* About 宣言区与特色网格 */
+    .manifesto-box {
+      font-family: var(--font-serif);
+      font-size: clamp(24px, 3.2vw, 42px);
+      line-height: 1.35;
+      color: var(--ink);
+      max-width: 980px;
+      margin-bottom: 80px;
+    }
+
+    .craft-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 280px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .pillar-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .pillar-content h3 {
+      font-family: var(--font-sans);
+      font-size: 19px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .pillar-content p {
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.65;
+    }
+
+    /* Services 画廊条目列表 */
+    .services-catalog {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .service-item {
+      display: grid;
+      grid-template-columns: 80px 1.4fr 2fr 100px;
+      align-items: baseline;
+      padding: 44px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s ease;
+    }
+
+    .service-item:hover {
+      padding-left: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      border-color: var(--border-dark);
+    }
+
+    .s-idx {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .s-title {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .s-desc {
+      font-size: 15px;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 500px;
+    }
+
+    .s-badge {
+      justify-self: end;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+    }
+
+    /* Contact 简洁工作室对话面板 */
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 80px;
+    }
+
+    .contact-editorial {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .contact-p {
+      font-size: 19px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      margin-bottom: 40px;
+    }
+
+    .contact-credentials {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      color: var(--ink);
+    }
+
+    .contact-credentials span {
+      color: var(--ink-muted);
+      display: inline-block;
+      width: 100px;
+    }
+
+    .contact-sheet {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    }
+
+    .form-row {
+      margin-bottom: 24px;
+    }
+
+    .form-row label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      color: var(--ink-muted);
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--ink);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--ink);
+      color: var(--bg);
+      border: none;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #333330;
+    }
+
+    /* 优雅页脚 */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* 手机端响应式排版 (Phone Layout) */
+    @media (max-width: 860px) {
+      .nav-dock {
+        width: 100%;
+        gap: 16px;
+        padding: 8px 16px;
+      }
+
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 80px;
+        left: 5%;
+        width: 90%;
+        background: var(--surface);
+        flex-direction: column;
+        padding: 36px 24px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .nav-link {
+        font-size: 18px;
+        color: var(--ink);
+      }
+
+      .menu-trigger {
+        display: block;
+      }
+
+      .hero {
+        padding: 140px 0 60px;
+      }
+
+      .hero-columns {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .craft-pillars {
+        grid-template-columns: 1fr;
+      }
+
+      .service-item {
+        grid-template-columns: 40px 1fr;
+        gap: 12px;
+      }
+
+      .s-desc, .s-badge {
+        grid-column: 2 / 3;
+      }
+
+      .s-badge {
+        justify-self: start;
+        margin-top: 8px;
+      }
+
+      .contact-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .contact-sheet {
+        padding: 32px 24px;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 悬浮岛式导航 -->
+  <div class="nav-dock-wrap">
+    <header class="nav-dock">
+      <a href="./index.html" class="brand-logo">Atelier&trade;</a>
+
+      <nav class="nav-links" id="nav-links">
+        <a href="#about" class="nav-link" data-i18n="nav-about">About</a>
+        <a href="#services" class="nav-link" data-i18n="nav-services">Services</a>
+        <a href="#contact" class="nav-link" data-i18n="nav-contact">Inquire</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="lang-pill" id="lang-btn">ZH / EN</button>
+        <button class="menu-trigger" id="menu-btn" aria-label="Toggle Menu">Menu</button>
+      </div>
+    </header>
+  </div>
+
+  <main>
+    <!-- 刊物封面式 Hero 区域 -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-meta-strip">
+          <div>// ARCHITECTURAL SOFTWARE & DESIGN</div>
+          <div>ISSUE &bull; N&deg; 24</div>
+          <div>BASE: ZURICH & SHANGHAI</div>
+        </div>
+
+        <h1 class="hero-heading" data-i18n="hero-h1">
+          Designing <em>durable systems</em> with quiet confidence & precision.
+        </h1>
+
+        <div class="hero-columns">
+          <p class="hero-caption" data-i18n="hero-p">
+            We partner with forward-thinking enterprises to sculpt software platforms, brand infrastructure, and distributed technical foundations that withstand the test of time.
+          </p>
+          <div class="hero-action-cell">
+            <a href="#contact" class="btn-craft" data-i18n="hero-cta">Commission Project &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 关于我们 About -->
+    <section class="section-wrap" id="about">
+      <div class="container">
+        <div class="section-label-row">
+          <span class="section-order">[ 01 ]</span>
+          <h2 class="section-headline" data-i18n="about-headline">The Philosophy</h2>
+        </div>
+
+        <div class="manifesto-box" data-i18n="about-manifesto">
+          "True craft is neither decorative nor fleeting. It is the measured orchestration of utility, human emotion, and impeccable software architecture."
+        </div>
+
+        <div class="craft-pillars">
+          <div class="pillar-card">
+            <span class="pillar-num">01 / RESTRAINT</span>
+            <div class="pillar-content">
+              <h3 data-i18n="pillar-1-t">Clarity over Complexity</h3>
+              <p data-i18n="pillar-1-d">We strip unnecessary layers to leave only intuitive flows and resilient codebases that grow seamlessly.</p>
+            </div>
+          </div>
+          <div class="pillar-card">
+            <span class="pillar-num">02 / ENDURANCE</span>
+            <div class="pillar-content">
+              <h3 data-i18n="pillar-2-t">Built for Longevity</h3>
+              <p data-i18n="pillar-2-d">Constructed on proven architectural paradigms, ensuring decades of stability instead of chasing fragile hype.</p>
+            </div>
+          </div>
+          <div class="pillar-card">
+            <span class="pillar-num">03 / EMPATHY</span>
+            <div class="pillar-content">
+              <h3 data-i18n="pillar-3-t">Human-Scale Craft</h3>
+              <p data-i18n="pillar-3-d">Every transition, typography choice, and API response is tuned for tactile delight and operational ease.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 核心业务 Services -->
+    <section class="section-wrap" id="services">
+      <div class="container">
+        <div class="section-label-row">
+          <span class="section-order">[ 02 ]</span>
+          <h2 class="section-headline" data-i18n="services-headline">Disciplines</h2>
+        </div>
+
+        <div class="services-catalog">
+          <div class="service-item">
+            <span class="s-idx">&sect; 01</span>
+            <h3 class="s-title" data-i18n="s1-name">Systems Architecture</h3>
+            <p class="s-desc" data-i18n="s1-desc">Distributed backend design, micro-framework topologies, and high-load database modeling for global scale.</p>
+            <span class="s-badge">CORE</span>
+          </div>
+
+          <div class="service-item">
+            <span class="s-idx">&sect; 02</span>
+            <h3 class="s-title" data-i18n="s2-name">Digital Flagships</h3>
+            <p class="s-desc" data-i18n="s2-desc">Immersive web platforms and tactile digital experiences with world-class editorial typography and motion.</p>
+            <span class="s-badge">EXPERIENCE</span>
+          </div>
+
+          <div class="service-item">
+            <span class="s-idx">&sect; 03</span>
+            <h3 class="s-title" data-i18n="s3-name">Strategic Advisory</h3>
+            <p class="s-desc" data-i18n="s3-desc">Engineering leadership, technology evaluation, security compliance, and organizational workflow redesign.</p>
+            <span class="s-badge">ADVISORY</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 联系我们 Contact -->
+    <section class="section-wrap" id="contact">
+      <div class="container">
+        <div class="section-label-row">
+          <span class="section-order">[ 03 ]</span>
+          <h2 class="section-headline" data-i18n="contact-headline">Dialogue</h2>
+        </div>
+
+        <div class="contact-container">
+          <div class="contact-editorial">
+            <div>
+              <p class="contact-p" data-i18n="contact-desc">
+                We accept a select number of bespoke engineering commissions each quarter. Tell us about your vision.
+              </p>
+            </div>
+
+            <div class="contact-credentials">
+              <div><span>INQUIRIES</span> atelier@studio-craft.internal</div>
+              <div><span>LOCATION</span> St. Gallen &bull; West Bund Shanghai</div>
+              <div><span>RESPONSE</span> Within 24 Business Hours</div>
+            </div>
+          </div>
+
+          <form class="contact-sheet" onsubmit="event.preventDefault(); alert('Inquiry received. We will respond promptly.');">
+            <div class="form-row">
+              <label for="c-name" data-i18n="lbl-name">Your Name / Title</label>
+              <input type="text" id="c-name" class="form-input" placeholder="e.g. Adrian Meier" required>
+            </div>
+            <div class="form-row">
+              <label for="c-mail" data-i18n="lbl-mail">Enterprise Email</label>
+              <input type="email" id="c-mail" class="form-input" placeholder="name@company.com" required>
+            </div>
+            <div class="form-row">
+              <label for="c-msg" data-i18n="lbl-msg">Brief Summary of Intent</label>
+              <textarea id="c-msg" class="form-input" rows="4" placeholder="Scope, timeline, and current challenge..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" data-i18n="btn-submit">Dispatch Inquiry &rarr;</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 极简页脚 -->
+  <footer class="footer container">
+    <div>&copy; <span id="year"></span> ATELIER INC. &bull; ALL RIGHTS RESERVED.</div>
+    <div>DESIGNED WITH RESTRAINT &bull; EDITION 2026</div>
+  </footer>
+
+  <!-- 中英文双语无刷新切换与交互逻辑 -->
+  <script>
+    const dictionary = {
+      en: {
+        'nav-about': 'About',
+        'nav-services': 'Services',
+        'nav-contact': 'Inquire',
+        'hero-h1': 'Designing <em>durable systems</em> with quiet confidence & precision.',
+        'hero-p': 'We partner with forward-thinking enterprises to sculpt software platforms, brand infrastructure, and distributed technical foundations that withstand the test of time.',
+        'hero-cta': 'Commission Project &rarr;',
+        'about-headline': 'The Philosophy',
+        'about-manifesto': '"True craft is neither decorative nor fleeting. It is the measured orchestration of utility, human emotion, and impeccable software architecture."',
+        'pillar-1-t': 'Clarity over Complexity',
+        'pillar-1-d': 'We strip unnecessary layers to leave only intuitive flows and resilient codebases that grow seamlessly.',
+        'pillar-2-t': 'Built for Longevity',
+        'pillar-2-d': 'Constructed on proven architectural paradigms, ensuring decades of stability instead of chasing fragile hype.',
+        'pillar-3-t': 'Human-Scale Craft',
+        'pillar-3-d': 'Every transition, typography choice, and API response is tuned for tactile delight and operational ease.',
+        'services-headline': 'Disciplines',
+        's1-name': 'Systems Architecture',
+        's1-desc': 'Distributed backend design, micro-framework topologies, and high-load database modeling for global scale.',
+        's2-name': 'Digital Flagships',
+        's2-desc': 'Immersive web platforms and tactile digital experiences with world-class editorial typography and motion.',
+        's3-name': 'Strategic Advisory',
+        's3-desc': 'Engineering leadership, technology evaluation, security compliance, and organizational workflow redesign.',
+        'contact-headline': 'Dialogue',
+        'contact-desc': 'We accept a select number of bespoke engineering commissions each quarter. Tell us about your vision.',
+        'lbl-name': 'Your Name / Title',
+        'lbl-mail': 'Enterprise Email',
+        'lbl-msg': 'Brief Summary of Intent',
+        'btn-submit': 'Dispatch Inquiry &rarr;'
+      },
+      zh: {
+        'nav-about': '设计哲学',
+        'nav-services': '专业实践',
+        'nav-contact': '洽谈合作',
+        'hero-h1': '以静水流深的笃定，构筑<em>历久弥新</em>的数字系统。',
+        'hero-p': '我们与具备远见的企业并肩协作，雕琢高水准的数字化平台、品牌底盘及经得起时间淘洗的高可用分布式技术底座。',
+        'hero-cta': '委托定制项目 &rarr;',
+        'about-headline': '工坊哲学',
+        'about-manifesto': '“真正的工匠技艺既非浮华的装饰，亦非随波逐流的狂欢。它是实用价值、人文感知与严谨软件架构之间的严密交响。”',
+        'pillar-1-t': '以纯粹克制复杂',
+        'pillar-1-d': '剥离一切不必要的冗余修饰，仅沉淀高度直觉的交互路径与弹性演进的底层代码库。',
+        'pillar-2-t': '为长期演进筑基',
+        'pillar-2-d': '基于经久验证的经典架构范式打造，拒绝盲从短命潮流，确保系统拥有十年以上的稳固生命力。',
+        'pillar-3-t': '回归人之尺度的精造',
+        'pillar-3-d': '每一次过渡微动、每一种字体排印与每一次 API 响应，均经过精细调谐以兼顾触感愉悦与运营效率。',
+        'services-headline': '专业范畴',
+        's1-name': '分布式系统工程',
+        's1-desc': '面向高并发全球场景的分布式后端、微服务架构拓扑规划与企业级数据模型治理。',
+        's2-name': '数字标杆旗舰呈现',
+        's2-desc': '融汇出版级古典版式设计、前沿流体微交互与触感体验的现代品牌数字空间。',
+        's3-name': '战略顾问与架构治理',
+        's3-desc': '高端技术选型审查、系统安全合规审计、技术团队效能演进与长期数字化架构咨询。',
+        'contact-headline': '开启对话',
+        'contact-desc': '我们每季度仅承接限定数量的定制工程委托。期待与您探讨关于数字未来的构想。',
+        'lbl-name': '您的姓名 / 称谓',
+        'lbl-mail': '企业工作邮箱',
+        'lbl-msg': '意向项目概述',
+        'btn-submit': '提交意向信函 &rarr;'
+      }
+    };
+
+    let currentLang = 'en';
+
+    function setLocale(lang) {
+      currentLang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dictionary[lang][key]) {
+          el.innerHTML = dictionary[lang][key];
+        }
+      });
+      document.getElementById('lang-btn').textContent = lang === 'en' ? 'EN / 中' : '中 / EN';
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    }
+
+    document.getElementById('lang-btn').addEventListener('click', () => {
+      setLocale(currentLang === 'en' ? 'zh' : 'en');
+    });
+
+    // 移动端菜单切换
+    const menuBtn = document.getElementById('menu-btn');
+    const navLinks = document.getElementById('nav-links');
+
+    menuBtn.addEventListener('click', () => {
+      const active = navLinks.classList.toggle('active');
+      menuBtn.textContent = active ? 'Close' : 'Menu';
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+        menuBtn.textContent = 'Menu';
+      });
+    });
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
